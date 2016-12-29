@@ -223,3 +223,58 @@ func (r *BulkStringRequest) Source() ([]string, error) {
 	r.source = lines
 	return lines, nil
 }
+
+func (r *BulkStringRequest) SetSource(input string) *BulkStringRequest {
+	// { "index" : { "_index" : "test", "_type" : "type1", "_id" : "1" } }
+	// { "field1" : "value1" }
+
+	if r.source != nil {
+		return r
+	}
+
+	lines := make([]string, 2)
+
+	// "index" ...
+	command := make(map[string]interface{})
+	indexCommand := make(map[string]interface{})
+	if r.index != "" {
+		indexCommand["_index"] = r.index
+	}
+	if r.typ != "" {
+		indexCommand["_type"] = r.typ
+	}
+	if r.id != "" {
+		indexCommand["_id"] = r.id
+	}
+	if r.routing != "" {
+		indexCommand["_routing"] = r.routing
+	}
+	if r.parent != "" {
+		indexCommand["_parent"] = r.parent
+	}
+	if r.version > 0 {
+		indexCommand["_version"] = r.version
+	}
+	if r.versionType != "" {
+		indexCommand["_version_type"] = r.versionType
+	}
+	if r.retryOnConflict != nil {
+		indexCommand["_retry_on_conflict"] = *r.retryOnConflict
+	}
+	if r.ttl != "" {
+		indexCommand["_ttl"] = r.ttl
+	}
+	if r.pipeline != "" {
+		indexCommand["pipeline"] = r.pipeline
+	}
+	command[r.opType] = indexCommand
+	line, err := json.Marshal(command)
+	if err != nil {
+		panic(err)
+	}
+	lines[0] = string(line)
+	lines[1] = input
+
+	r.source = lines
+	return r
+}
