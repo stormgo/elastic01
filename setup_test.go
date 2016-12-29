@@ -93,6 +93,16 @@ const (
 `
 )
 
+type employee struct {
+	User string `json:"user"`
+	City string `json:"city"`
+	Age  int    `json:"age"`
+}
+
+func (t employee) String() string {
+	return fmt.Sprintf("employee{User:%q,City:%q,Age:%d}", t.User, t.City, t.Age)
+}
+
 type tweet struct {
 	User     string        `json:"user"`
 	Message  string        `json:"message"`

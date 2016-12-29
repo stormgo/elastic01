@@ -6,7 +6,6 @@ package elastic
 
 import (
 	"testing"
-	"time"
 )
 
 func TestBulkStringRequestSerialization(t *testing.T) {
@@ -16,56 +15,56 @@ func TestBulkStringRequestSerialization(t *testing.T) {
 	}{
 		// #0
 		{
-			Request: NewBulkStringRequest().Index("index1").Type("tweet").Id("1").
-				Doc(tweet{User: "olivere", Created: time.Date(2014, 1, 18, 23, 59, 58, 0, time.UTC)}),
+			Request: NewBulkStringRequest().Index("index101").Type("employee").Id("1").
+				Doc(employee{User: "olivere"}),
 			Expected: []string{
-				`{"index":{"_id":"1","_index":"index1","_type":"tweet"}}`,
-				`{"user":"olivere","message":"","retweets":0,"created":"2014-01-18T23:59:58Z"}`,
+				`{"index":{"_id":"1","_index":"index101","_type":"employee"}}`,
+				`{"user":"olivere","city":"","age":0}`,
 			},
 		},
 		// #1
 		{
-			Request: NewBulkStringRequest().OpType("create").Index("index1").Type("tweet").Id("1").
-				Doc(tweet{User: "olivere", Created: time.Date(2014, 1, 18, 23, 59, 58, 0, time.UTC)}),
+			Request: NewBulkStringRequest().OpType("create").Index("index101").Type("employee").Id("1").
+				Doc(employee{User: "olivere"}),
 			Expected: []string{
-				`{"create":{"_id":"1","_index":"index1","_type":"tweet"}}`,
-				`{"user":"olivere","message":"","retweets":0,"created":"2014-01-18T23:59:58Z"}`,
+				`{"create":{"_id":"1","_index":"index101","_type":"employee"}}`,
+				`{"user":"olivere","city":"","age":0}`,
 			},
 		},
 		// #2
 		{
-			Request: NewBulkStringRequest().OpType("index").Index("index1").Type("tweet").Id("1").
-				Doc(tweet{User: "olivere", Created: time.Date(2014, 1, 18, 23, 59, 58, 0, time.UTC)}),
+			Request: NewBulkStringRequest().OpType("index").Index("index101").Type("employee").Id("1").
+				Doc(employee{User: "olivere"}),
 			Expected: []string{
-				`{"index":{"_id":"1","_index":"index1","_type":"tweet"}}`,
-				`{"user":"olivere","message":"","retweets":0,"created":"2014-01-18T23:59:58Z"}`,
+				`{"index":{"_id":"1","_index":"index101","_type":"employee"}}`,
+				`{"user":"olivere","city":"","age":0}`,
 			},
 		},
 		// #3
 		{
-			Request: NewBulkStringRequest().OpType("index").Index("index1").Type("tweet").Id("1").RetryOnConflict(42).
-				Doc(tweet{User: "olivere", Created: time.Date(2014, 1, 18, 23, 59, 58, 0, time.UTC)}),
+			Request: NewBulkStringRequest().OpType("index").Index("index101").Type("employee").Id("1").RetryOnConflict(42).
+				Doc(employee{User: "olivere"}),
 			Expected: []string{
-				`{"index":{"_id":"1","_index":"index1","_retry_on_conflict":42,"_type":"tweet"}}`,
-				`{"user":"olivere","message":"","retweets":0,"created":"2014-01-18T23:59:58Z"}`,
+				`{"index":{"_id":"1","_index":"index101","_retry_on_conflict":42,"_type":"employee"}}`,
+				`{"user":"olivere","city":"","age":0}`,
 			},
 		},
 		// #4
 		{
-			Request: NewBulkStringRequest().OpType("index").Index("index1").Type("tweet").Id("1").Pipeline("my_pipeline").
-				Doc(tweet{User: "olivere", Created: time.Date(2014, 1, 18, 23, 59, 58, 0, time.UTC)}),
+			Request: NewBulkStringRequest().OpType("index").Index("index101").Type("employee").Id("1").Pipeline("my_pipeline").
+				Doc(employee{User: "olivere"}),
 			Expected: []string{
-				`{"index":{"_id":"1","_index":"index1","_type":"tweet","pipeline":"my_pipeline"}}`,
-				`{"user":"olivere","message":"","retweets":0,"created":"2014-01-18T23:59:58Z"}`,
+				`{"index":{"_id":"1","_index":"index101","_type":"employee","pipeline":"my_pipeline"}}`,
+				`{"user":"olivere","city":"","age":0}`,
 			},
 		},
 		// #5
 		{
-			Request: NewBulkStringRequest().OpType("index").Index("index1").Type("tweet").Id("1").TTL("1m").
-				Doc(tweet{User: "olivere", Created: time.Date(2014, 1, 18, 23, 59, 58, 0, time.UTC)}),
+			Request: NewBulkStringRequest().OpType("index").Index("index101").Type("employee").Id("1").TTL("1m").
+				Doc(employee{User: "olivere"}),
 			Expected: []string{
-				`{"index":{"_id":"1","_index":"index1","_ttl":"1m","_type":"tweet"}}`,
-				`{"user":"olivere","message":"","retweets":0,"created":"2014-01-18T23:59:58Z"}`,
+				`{"index":{"_id":"1","_index":"index101","_ttl":"1m","_type":"employee"}}`,
+				`{"user":"olivere","city":"","age":0}`,
 			},
 		},
 	}
@@ -87,17 +86,4 @@ func TestBulkStringRequestSerialization(t *testing.T) {
 			}
 		}
 	}
-}
-
-var BulkStringRequestSerializationResult string
-
-func BenchmarkBulkStringRequestSerialization(b *testing.B) {
-	r := NewBulkStringRequest().Index(testIndexName).Type("tweet").Id("1").
-		Doc(tweet{User: "olivere", Created: time.Date(2014, 1, 18, 23, 59, 58, 0, time.UTC)})
-	var s string
-	for n := 0; n < b.N; n++ {
-		s = r.String()
-		r.source = nil // Don't let caching spoil the benchmark
-	}
-	BulkStringRequestSerializationResult = s // ensure the compiler doesn't optimize
 }
