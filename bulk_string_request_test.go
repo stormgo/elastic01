@@ -25,10 +25,10 @@ func TestBulkStringRequestSerialization(t *testing.T) {
 		// #1
 		{
 			Request: NewBulkStringRequest().OpType("create").Index("index101").Type("employee").Id("1").
-				Doc(employee{User: "olivere"}),
+				Doc(employee{User: "olivere", City: "santafe", Age: 56}),
 			Expected: []string{
 				`{"create":{"_id":"1","_index":"index101","_type":"employee"}}`,
-				`{"user":"olivere","city":"","age":0}`,
+				`{"user":"olivere","city":"santafe","age":56}`,
 			},
 		},
 		// #2
