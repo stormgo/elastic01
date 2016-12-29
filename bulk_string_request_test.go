@@ -15,37 +15,46 @@ func TestBulkStringRequestSetString(t *testing.T) {
 	}{
 		// #0
 		{
-			Request: NewBulkStringRequest().Index("index101").Type("employee").Id("1").
+			Request: NewBulkStringRequest().Index("index101").Type("employee").Id("0").
 				SetSource(`{"user":"olivere","city":"","age":0}`),
 			Expected: []string{
-				`{"index":{"_id":"1","_index":"index101","_type":"employee"}}`,
+				`{"index":{"_id":"0","_index":"index101","_type":"employee"}}`,
 				`{"user":"olivere","city":"","age":0}`,
 			},
 		},
 		// #1
 		{
 			Request: NewBulkStringRequest().OpType("create").Index("index101").Type("employee").Id("1").
-				Doc(employee{User: "olivere", City: "santafe", Age: 56}),
+				SetSource(`{"user":"sam","city":"corvallis","age":51}`),
 			Expected: []string{
 				`{"create":{"_id":"1","_index":"index101","_type":"employee"}}`,
-				`{"user":"olivere","city":"santafe","age":56}`,
+				`{"user":"sam","city":"corvallis","age":51}`,
 			},
 		},
 		// #2
 		{
-			Request: NewBulkStringRequest().OpType("index").Index("index101").Type("employee").Id("1").
-				Doc(employee{User: "olivere"}),
+			Request: NewBulkStringRequest().OpType("create").Index("index101").Type("employee").Id("2").
+				SetSource(`{"user":"olivere","city":"santafe","age":56}`),
 			Expected: []string{
-				`{"index":{"_id":"1","_index":"index101","_type":"employee"}}`,
-				`{"user":"olivere","city":"","age":0}`,
+				`{"create":{"_id":"2","_index":"index101","_type":"employee"}}`,
+				`{"user":"olivere","city":"santafe","age":56}`,
 			},
 		},
 		// #3
 		{
-			Request: NewBulkStringRequest().OpType("index").Index("index101").Type("employee").Id("1").RetryOnConflict(42).
+			Request: NewBulkStringRequest().OpType("index").Index("index101").Type("employee").Id("3").
 				Doc(employee{User: "olivere"}),
 			Expected: []string{
-				`{"index":{"_id":"1","_index":"index101","_retry_on_conflict":42,"_type":"employee"}}`,
+				`{"index":{"_id":"3","_index":"index101","_type":"employee"}}`,
+				`{"user":"olivere","city":"","age":0}`,
+			},
+		},
+		// #4
+		{
+			Request: NewBulkStringRequest().OpType("index").Index("index101").Type("employee").Id("4").RetryOnConflict(42).
+				Doc(employee{User: "olivere"}),
+			Expected: []string{
+				`{"index":{"_id":"4","_index":"index101","_retry_on_conflict":42,"_type":"employee"}}`,
 				`{"user":"olivere","city":"","age":0}`,
 			},
 		},
